@@ -1,0 +1,22 @@
+# Light Controller
+
+## Introduction
+This project is built using ESP-32S3 device. 
+The device will involve in provisioning and primarily acts as a light controller.
+
+First, go to http://192.168.1.2 after connecting to the device's wifi access point, and it will serve a web page.
+Then, click on the web page and proceed to select a network to connect. In this case, please select "coolwatch" to 
+establish connection with the watch.
+
+The Green LED lights are simulating the real life smart light.
+
+## LED Indication
+RED blinking      - the device is setting up. If blinking has stopped, the device has completed the setup.
+
+RED (only) none   - the device has finished the setup process.
+
+YELLOW blinking   - the device is waiting for successful connection.
+
+YELLOW lighted up - the device has successfully established connection to the web server. (Currently broken, in progress for fixing it.)
+
+GREEN lighted up  - light is on. 

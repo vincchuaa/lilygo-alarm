@@ -1,0 +1,114 @@
+ # Motion-Based Alarm and Wifi Controlled LED Lights
+
+
+This project is a unique alarm system designed for waking users up, with a combination of motor vibration and alarm audio playback. Rather than normal alarms where users could turn off using a button, this project only allows alarm deactivation after walking a certain number of steps. LilyGo T Watch 2020 V3's built-in motion sensor detects movement, thus presenting an effective way for users waking up. Additionally, this system presents WiFi communication between the watch and Adafruit ESP32 microcontroller for performing actions such as turning on/off LED lights.
+
+## Getting Started
+
+
+### <a name="hardware"></a> Hardware
+#### Watch
+A [LilyGo T Watch 2020 V3 watch](https://www.lilygo.cc/products/t-watch-2020-v3?variant=42275965403317) is required for demonstrating this alarm system. Please make sure your T Watch is **V3** as other versions may not be compatible with this project.
+
+
+#### ESP32 Watch LED Controller
+
+
+In order to demonstrate turning LED lights on/off, please prepare the following components and construct the setup as shown in the picture below:
+- 1 ESP32S3 microcontroller feather board
+- breadboard (25 x 15)
+- 2 x green LED
+- 1 x yellow LED
+- 1 x red LED
+- 4 x 120Ω resistors
+- 4 x ribbon cable (or equivalent solid core wire pieces)
+- USB C cable
+
+
+**Example setup of the ESP32 microcontroller**
+
+
+<img style="margin-right:100px;" src="https://i.imgur.com/z9URqXv.jpeg" alt="drawing" width="300"/>
+
+
+An Adafruit ESP32S Feather has been inserted to a breadboard and wired up to four LEDs via GPIO pins where green LEDS is connected to pins 12 and 5. Yellow LED is connected to the pin 9 where the red LED is connected to the pin 6. 120 Ohm resistors have been used to prevent LEDS from burning out.
+
+
+### <a name="firmware"></a> Firmware
+The full pinout table for the embedded firmware of LilyGo T Watch 2020 V3 watch can be obtained [here](https://github.com/Xinyuan-LilyGO/TTGO_TWatch_Library/blob/master/docs/watch_2020_v3.md). The following firmwares are used in this project:
+- **MOTOR**. This firmware is used for controlling the built-in vibrator module in the watch. The motor is set to vibrate when the alarm is set off.
+- **BMA423**. This is an accelerometer sensor for detecting motion-related events. This project uses this sensor for step counter implementation, which is a part of the alarm system.
+- **I2S** is used for transmitting digital audio data across the watch. This project utilises this firmware for audio playback for the alarm system.
+- **PCF8563** provides functionalities on managing time in the watch. It also allows keeping efficient track of time (hours, minutes and seconds) and date (year, month and day) formats.
+
+### <a name="libraries"></a> Libraries/Dependencies
+Note that these dependencies are mandatory for this project. Please ensure that you have these dependencies beforehand by installing them by navigating the Arduino's toolbar, `Tools->Manage Libraries...`. You can also manually clone these dependencies into your `~/Arduino/libraries` directory.
+
+
+1. [TTGO_TWatch_Library](https://github.com/Xinyuan-LilyGO/TTGO_TWatch_Library/). A LilyGo watch library that provides built-in functionalities such as vibration motor, axis sensor etc.
+2. [ESP8266Audio](https://github.com/earlephilhower/ESP8266Audio). An Arduino library for parsing and decoding various audio file formats.
+3. [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI). A library for displaying TFT displays with ESP32 by drawing various shapes, images and text.
+4. Wifi. Arduino's built-in library for enabling network connection.
+
+
+
+### Setup and Installation
+1. Install the [Arduino IDE](https://www.arduino.cc/en/software).
+2. Install all required libraries in [Libraries/Dependencies](#libraries) by following the provided instruction in that section.
+3. Build your ESP32 microcontroller setup as shown in the [hardware](#hardware) section. Ensure that all the necessary components are properly connected. (Refer to [hardware](#hardware) for detailed instructions on the hardware setup)
+4. Clone this repository and open the `alarm` sketch in the IDE.
+5. Connect your watch to the device and burn the sketch into the watch by clicking `Sketch->Upload` in the Arduino toolbar.
+6. Open `LightController` sketch (may need to use Platform IO) and burn it into the Feather ESP32S.
+7. Start the watch and make sure the Feather ESP32S is connected to a power source.
+8. Connect to Feather ESP32S using your device, and go onto http://192.168.1.2, and click on the `Connect Manually` button to see the list of available networks.
+9. Select `coolwatch` from the list, refresh the page if it is not found, and type in the password `dumbpassword` to connect to the watch.
+10. Setup is complete, on the watch, press `light 1` button to light up green LED number 1 and press `light 2` for green LED number 2!
+
+
+###  Usage
+- When the sketch is uploaded to the watch, the time is set to 15:00:55 PM and the alarm will be activated when it reaches 15:01:00 PM. (Please refer to [Configuration](#config) for modifying the alarm time to your preference.)
+- **Light 1** and **Light 2** buttons will be shown for turning on and off of the selected the LED lights through Wi-Fi communication between the watch and the ESP32 microcontroller hardware as shown in the [Hardware](#hardware) section.
+- Wear the watch to feel the power of the alarm! The wearer can only turn off the alarm by walking (the recommended walking steps are at least 10).
+
+**Demonstration of the alarm system**
+
+<img style="margin-right:100px;" src="https://i.imgur.com/utFkLFZ.jpeg" alt="drawing" width="200"/>
+<img src="https://i.imgur.com/QaXaLfS.jpeg" alt="drawing" width="195"/>
+
+
+
+## <a name="config"></a> Configuration
+- **Changing alarm ringtone**. Include your audio file (C header source file type) in the project directory (`com3505-student-2023\LA2\alarm`) and rename the audiofile name in the sketch into your preferred audiofile name. Please note that this project only supports RAW format, check the example audiofile provided `(pika.h)` for guidance. (Refer to [this library](https://github.com/PaulStoffregen/Audio/blob/master/extras/wav2sketch/wav2sketch.c) for changing WAV to RAW format.)
+- **Changing alarm time**. This project does not support an interface for changing alarm time, but you could modify the alarm under the `setup` function using the `RTC (Real Time Clock)` module. For example, you could configure the time using `setAlarmByMinutes()` function and set the alarm to set off after certain minutes/hours using `setAlarmByMinutes()/setAlarmByHours()` functions. (Refer to [this library](https://github.com/Xinyuan-LilyGO/TTGO_TWatch_Library/tree/master/src/drive/rtc) for accessing more RTC functions.)
+
+### Testing
+During the development stage of the project, various tests were conducted to ensure the correctness of the project. This is mainly done through printing on the serial monitor and manual result inspections. Note that the majority of our test is done manually, there is no involvement of automated testing. In the `\com3505-student-2023\LA2\test` folder, a unit test can be found to detect if all built-in firmware of the watch are functioning as expected. The following list mentions a series of tests that were conducted in the project and its corresponding outcome:
+- Alarm deactivated when the step counter reaches the desired target: Pass.
+- Alarm activated when the time reaches: Pass.
+- Vibrations can be felt when the alarm is triggered: Pass.
+- WiFi provisioning (controller to watch): Pass.
+- WiFi provisioning (laptop to controller): Pass.
+- WiFi provisioning (laptop to watch): Pass.
+- Controller reading content (raw value) on the url “/lights” served by the watch: Failed.
+- Controller reading payload length of the content served on the url “/lights” served by the watch: Pass.
+- On the root page “/” served by the controller, it should show the statuses of the light: Failed.
+- On the “/wifi” page served by the controller, it should allow reconnection to a network by providing the “Connect Manually”: Pass.
+- Red LED lights up and blinks when the controller is setting up: Pass
+- Yellow LED blinks to indicate the controller is waiting for wifi controller: Pass.
+- Yellow LED lights up and stay lightened up to indicate the controller is connected to the watch / or simply a network: Failed.
+- Green LED (pin number 12) lights up when the payload length is 1: Pass.
+- Green LED (pin number 12) is turned off when the payload length is 3: Failed.
+- Green LED (pin number 5) lights up when the payload is 4: Pass
+- Green LED (pin number 5) lights up when the payload is more than 4: Pass.
+- When Green LED (pin number 12) is lighting up, clicking the Light 1 button again will **always** turn off the Green LED (pin number 12): Failed.
+- When Green LED (pin number 5) is lighting up, clicking the Light 2 button again will **always** turn off the Green LED (pin number 12): Failed.
+- Light 1 button is always clickable: Pass.
+- Light 2 button is always clickable: Pass.
+- Real Time Clock displayed on the watch, should be updating per second: Pass.
+
+
+### Interesting Future Development
+- **Development of a Time Selection User Interface**: As of now, our application lacks a feature enabling users to alter the alarm time directly through the user interface. It's a functionality that could greatly enhance user experience and ease of use. To address this, future work could involve the design and implementation of an intuitive user interface that enables users to modify the alarm time with minimal effort. This improvement can be achieved by integrating the TFT_espi library, a versatile tool for creating robust graphical user interfaces. Furthermore, an RTC (Real-Time Clock) module could be utilised to enable the setting and adjustment of the alarm time. This would offer a more streamlined user experience and allow users more control over their devices.
+- **Integration to Smart Appliances**: The current project showcases the capability of establishing WiFi communication between two ESP32 devices. This opens up an array of opportunities for expanding the functionality of the project. A logical next step would be the integration with smart appliances, effectively transforming our application into a control hub for various home devices. For instance, the device could connect with smart LED lights, allowing users to manage their home lighting systems directly from the watch. Moreover, we have also found an interesting way to extend our project which is to incorporate a smart thermostat. 
+The smart thermostat example can be found from this [project](https://github.com/G6EJD/ESP-SMART-Thermostat) where it involves creating a smart thermostat using ESP32. We believe that having the live data of the thermostat being streamed on the watch is beneficial as the wearer can be aware of the temperature in the house.
+This integration step would be significant in expanding the horizons of the project, positioning it not only as an alarm application but also as a central control system for a smart home environment.
